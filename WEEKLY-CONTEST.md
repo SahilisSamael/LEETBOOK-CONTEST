@@ -60,3 +60,73 @@
                         if nums[i] > nums[j]:
                             dp[i] = max(dp[i], dp[j] + 1)
                 return max(dp)        
+
+
+
+
+# Biweekly Contest 85
+
+### 2382. Maximum Segment Sum After Removals
+        class Solution:
+            def maximumSegmentSum(self, nums: List[int], removeQueries: List[int]) -> List[int]:
+                ans, seg, top = [], {}, 0
+                for q in reversed(removeQueries):
+                    ans.append(top)
+                    l = seg.get(q-1, (q, 0))
+                    r = seg.get(q+1, (q, 0))
+                    s = nums[q] + l[1] + r[1]
+                    seg[l[0]] = (r[0], s)
+                    seg[r[0]] = (l[0], s)
+                    top = max(s, top)
+                return ans[::-1]
+
+
+### 2381. Shifting Letters II
+        class Solution:
+            def shiftingLetters(self, s: str, shifts: List[List[int]]) -> str:
+                n = len(s)
+                d = collections.Counter()
+                for st, e, right in shifts:
+                    d[st] += 1 if right else -1         # Mark at the beginning to indicate everything after it need to be shifted
+                    if e+1 < n:                         # Mark (inversely) at the index after the end, to negate the unnecessary shifts
+                        d[e+1] += -1 if right else 1
+                prefix = [0]                            # Initialize the prefix array
+                ans = ''
+                for i in range(n):                      # Use prefix sum style to accumulate all shifts needed, which were carried over from the previous index
+                    cur = prefix[-1] + d[i]
+                    prefix.append(cur)
+                    ans += string.ascii_lowercase[(ord(s[i]) - ord('a') + cur) % 26]
+                return ans
+
+
+### 2380. Time Needed to Rearrange a Binary String
+        class Solution:
+            def secondsToRemoveOccurrences(self, s: str) -> int:
+                res = 0
+                while "01" in s:
+                    s = s.replace("01", "10")
+                    res += 1
+                return res
+
+
+### 2379. Minimum Recolors to Get K Consecutive Black Blocks
+        class Solution:
+            def minimumRecolors(self, blocks: str, k: int) -> int:
+                count = 0 # to count number of white blocks in each window
+                result = 999
+
+                i,j = 0,0
+                while j < len(blocks):
+                    if blocks[j] == 'W':
+                        count += 1
+
+                    if j-i+1 < k:
+                        j += 1
+                    elif j-i+1 == k:
+                        result = min(result, count) # to get minimum white blocks in a window of size k
+
+                        if blocks[i] == 'W': # if the removed element in white block then also reduce the count
+                            count -= 1
+                        i+=1
+                        j+=1
+                return result         
